@@ -36,4 +36,7 @@ public class Arguments
     [Option("globalclass", HelpText = "Sets default global class instead of \"<Module>\"")]
     public string GlobalClass { get; init; } = "";
 
+    [Option("fullexceptioninfo", HelpText = "Toggles exception full info printing", Default = false)]
+    public bool ShowFullExceptionInfo { get; init; } = false;
+
 }

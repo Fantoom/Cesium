@@ -26,7 +26,20 @@ return await parserResult.MapResult(async args =>
             _ => TargetRuntimeDescriptor.Net60
         };
 
-        return await Compilation.Compile(args.InputFilePaths, args.OutputFilePath, targetRuntime, args.ModuleKind, args.Namespace, args.GlobalClass);
+        try
+        {
+            return await Compilation.Compile(args.InputFilePaths, args.OutputFilePath, targetRuntime, args.ModuleKind, args.Namespace, args.GlobalClass);
+        }
+        catch (AggregateException e)
+        {
+            if (!args.ShowFullExceptionInfo)
+                throw;
+
+            Console.WriteLine("\n--- One or more errors occurred. --->\n");
+            var message = "-- " + string.Join("\n-- ", e.Flatten().InnerExceptions.Select(x => x.Message));
+            Console.WriteLine(message);
+            return -1;
+        }
     },
     _ =>
     {
