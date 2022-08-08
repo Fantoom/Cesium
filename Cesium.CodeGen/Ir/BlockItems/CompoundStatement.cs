@@ -23,9 +23,20 @@ internal class CompoundStatement : IBlockItem
 
     public void EmitTo(IDeclarationScope scope)
     {
+        List<Exception> exceptions = new();
         foreach (var item in _items)
         {
-            item.Lower().EmitTo(scope);
+            try
+            {
+                item.Lower().EmitTo(scope);
+
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
         }
+        if (exceptions.Count > 0)
+            throw new AggregateException(exceptions);
     }
 }

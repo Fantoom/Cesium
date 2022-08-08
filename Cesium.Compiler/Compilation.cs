@@ -23,11 +23,21 @@ internal static class Compilation
         Console.WriteLine($"Generating assembly {outputFilePath}.");
         var assemblyContext = CreateAssembly(outputFilePath, targetRuntime, moduleKind, @namespace, globalClassFQN);
 
+        List<Exception> exceptions = new List<Exception>();
         foreach (var inputFilePath in inputFilePaths)
         {
             Console.WriteLine($"Processing input file \"{inputFilePath}\".");
-            await GenerateCode(assemblyContext, inputFilePath);
+            try
+            {
+                await GenerateCode(assemblyContext, inputFilePath);
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
         }
+        if (exceptions.Count > 0)
+            throw new AggregateException(exceptions);
 
         SaveAssembly(assemblyContext, targetRuntime.Kind, outputFilePath);
 

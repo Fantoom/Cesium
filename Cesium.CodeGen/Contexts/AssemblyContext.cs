@@ -49,9 +49,22 @@ public class AssemblyContext
 
     public void EmitTranslationUnit(IEnumerable<ITopLevelNode> nodes)
     {
+        List<Exception> exceptions = new();
         var context = new TranslationUnitContext(this);
+
         foreach (var node in nodes)
-            node.EmitTo(context);
+        {
+            try
+            {
+                node.EmitTo(context);
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+        if (exceptions.Count > 0)
+            throw new AggregateException(exceptions);
     }
 
     /// <summary>Do final code generation tasks, analogous to linkage.</summary>
