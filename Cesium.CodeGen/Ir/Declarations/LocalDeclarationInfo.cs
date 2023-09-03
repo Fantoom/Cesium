@@ -213,7 +213,7 @@ internal record LocalDeclarationInfo(
 
                     // TODO[#126]: should check that size required in scoped declaration and not needed in parameter declaration
                     if (sizeExpr == null)
-                        type = new PointerType(type);
+                        type = new OpaqueArray(type);
                     else
                     {
                         if (sizeExpr is not ConstantLiteralExpression constantExpression ||

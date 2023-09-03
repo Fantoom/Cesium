@@ -273,6 +273,25 @@ internal static class BlockItemLowering
             {
                 var resolvedFunctionType = (FunctionType)scope.ResolveType(d.FunctionType);
                 var (parameters, returnType) = resolvedFunctionType;
+
+                if (parameters is not null && parameters.Parameters.Any(x => x.Type is OpaqueArray))
+                {
+                    resolvedFunctionType = resolvedFunctionType with
+                    {
+                        Parameters = parameters with
+                        {
+                            Parameters = parameters.Parameters
+                            .Select(x =>
+                            {
+                                if (x.Type is OpaqueArray opaqueArray)
+                                    return new ParameterInfo(new PointerType(opaqueArray.Base), x.Name);
+                                else
+                                    return x;
+                            }).ToList()
+                        }
+                    };
+                }
+
                 if (d.IsMain && !returnType.Equals(scope.CTypeSystem.Int))
                     throw new CompilationException(
                         $"Invalid return type for the {d.Name} function: " +
